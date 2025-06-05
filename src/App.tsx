@@ -42,13 +42,9 @@ function App() {
   localStorage.setItem("listaDeCompras", JSON.stringify(lista));
 }, [lista]);
 
-
-
-
-
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white w-[800px] h-[800px] rounded-2xl p-8 px-16 shadow-lg overflow-y-auto">
+      <div className="bg-white w-[800px] h-[800px] rounded-2xl p-8 md:px-16 px-4 shadow-lg overflow-y-auto">
         <h1 className="text-center font-extrabold text-4xl text-blue-700">Lista de Compras</h1>
         <p className="text-center border-b-2 border-zinc-500 pb-2 text-zinc-600">Facilite sua ida ao supermercado</p>
 
