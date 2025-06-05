@@ -1,106 +1,110 @@
-import logo from './assets/logo.svg';
-import trash from './assets/trash.svg';
-import todo from './assets/todo.svg';
-import done from './assets/done.svg';
+import { useState } from "react";
+import trashIcon from './assets/trash.svg';
+interface ItemLista {
+  item: string;
+  unid: string;
+  checked?: boolean;
+}
 
 function App() {
+  const [item, setItem] = useState('');
+  const [unid, setUnid] = useState('');
+  const [lista, setLista] = useState<ItemLista[]>([]);
+
+  const handleSubmit = () => {
+    if (!item || !unid) return;
+    const novoItem: ItemLista = { item, unid, checked: false };
+    setLista([...lista, novoItem]);
+    setItem('');
+    setUnid('');
+  };
+
+  const handleToggleCheck = (index: number) => {
+    const novaLista = [...lista];
+    novaLista[index].checked = !novaLista[index].checked;
+    setLista(novaLista);
+  };
+
+  const handleDeleteItem = (index: number) => {
+    const novaLista = lista.filter((_, i) => i !== index);
+    setLista(novaLista);
+  };
+
+  const pendentes = lista.filter(item => !item.checked);
+  const comprados = lista.filter(item => item.checked);
+
   return (
-    <main className="max-w-2xl px-6 py-12 pb-20 mx-auto my-10 bg-white md:my-20 md:px-32 md:rounded-3xl">
-      <header className="text-center">
-        <img src={logo} alt="logotipo" className="mx-auto" />
-        <h1 className="mt-4 text-3xl font-medium font-display">
-          Lista de Compras
-        </h1>
-        <p className="text-sm text-slate-500">
-          Facilite sua ida ao supermercado!
-        </p>
-        <hr className="w-1/3 mx-auto mt-6 mb-8" />
-      </header>
-      <form className="flex gap-2">
-        <div className="flex-shrink">
-          <label htmlFor="name" className="block text-xs text-slate-400">
-            Item
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="block w-full px-3 py-2 border rounded-lg border-slate-300 text-slate-700"
-          />
+    <div className="h-screen w-screen flex items-center justify-center bg-slate-100">
+      <div className="bg-white w-[1000px] h-[800px] rounded-2xl p-8 px-16 shadow-lg overflow-y-auto">
+        <h1 className="text-center font-extrabold text-4xl text-blue-700">Lista de Compras</h1>
+        <p className="text-center border-b-2 border-zinc-500 pb-2 text-zinc-600">Facilite sua ida ao supermercado</p>
+
+        <div className="flex mt-8 items-center justify-center gap-4">
+          <div>
+            <h1 className="font-medium">Item</h1>
+            <input type="text" value={item} onChange={(e) => setItem(e.target.value)} className="px-4 py-2 border-2 rounded-lg border-zinc-300"
+            placeholder="Ex: Arroz"/>
+          </div>
+          <div>
+            <h1 className="font-medium">Quantidade</h1>
+            <input type="text" value={unid} onChange={(e) => setUnid(e.target.value)}
+            className="w-40 py-2 px-4 border-2 rounded-lg border-zinc-300"
+            placeholder="Ex: 1kg" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-white select-none">.</span>
+            <button onClick={handleSubmit} className="flex items-baseline px-8 py-2 border-2 rounded-lg
+             bg-blue-800 text-white font-bold hover:bg-blue-600 transition"> + </button>
+          </div>
         </div>
-        <div className="flex-shrink">
-          <label htmlFor="quantity" className="block text-xs text-slate-400">
-            Quantidade
-          </label>
-          <input
-            type="text"
-            id="quantity"
-            className="block w-full px-3 py-2 border rounded-lg border-slate-300 text-slate-700"
-          />
+
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-zinc-700 mb-4">Itens pendentes</h2>
+          <div className="flex flex-col gap-4 px-2">
+            {pendentes.length === 0 ? (
+              <p className="text-zinc-400">Nenhum item pendente.</p>
+            ) : (
+              pendentes.map((item, index) => (
+                <div key={index} className="flex gap-6 items-center">
+                  <button onClick={() => handleToggleCheck(lista.indexOf(item))}
+                    className="border-2 rounded-full h-6 w-6 flex items-center justify-center hover:bg-green-500"/>
+                  <div className="border-b w-[500px]">
+                    <h1 className="font-semibold text-xl">{item.item}</h1>
+                    <p className="text-zinc-500">{item.unid}</p>
+                  </div>
+                  <img src={trashIcon} alt="trash" onClick={() => handleDeleteItem(lista.indexOf(item))}
+                    className="w-6 h-6 cursor-pointer hover:scale-110 transition"/>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-        <button className="self-end flex-shrink h-10 px-4 font-extrabold text-white rounded-lg bg-fuchsia-300">
-          +
-        </button>
-      </form>
-      <section className="mt-10 space-y-3 ">
-        <article className="flex w-full gap-4">
-          <img src={todo} alt="#" />
-          <div className="flex-1">
-            <p>Leite</p>
-            <p className="text-sm text-slate-400">3 Caixas</p>
+
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-zinc-700 mb-4">Itens já comprados</h2>
+          <div className="flex flex-col gap-4 px-2">
+            {comprados.length === 0 ? (
+              <p className="text-zinc-400">Nenhum item comprado ainda.</p>
+            ) : (
+              comprados.map((item, index) => (
+                <div key={index} className="flex gap-6 items-center">
+                  <button onClick={() => handleToggleCheck(lista.indexOf(item))}
+                    className="border-2 rounded-full h-6 w-6 flex items-center justify-center bg-green-500">
+                    ✔
+                  </button>
+                  <div className="border-b w-[500px]">
+                    <h1 className="font-semibold text-xl line-through text-zinc-400">{item.item}</h1>
+                    <p className="text-zinc-400 line-through">{item.unid}</p>
+                  </div>
+                  <img src={trashIcon} alt="trash" onClick={() => handleDeleteItem(lista.indexOf(item))}
+                    className="w-6 h-6 cursor-pointer hover:scale-110 transition"/>
+                </div>
+              ))
+            )}
           </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-        <article className="flex w-full gap-4">
-          <img src={todo} alt="#" />
-          <div className="flex-1">
-            <p>Maçã</p>
-            <p className="text-sm text-slate-400">500g</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-      </section>
-      <section className="mt-16 space-y-3">
-        <h2 className="mb-10 text-3xl text-center font-display">
-          Itens já comprados
-        </h2>
-        <article className="flex w-full gap-4">
-          <img src={done} alt="#" />
-          <div className="flex-1">
-            <p className="line-through text-slate-400">Leite</p>
-            <p className="text-sm line-through text-slate-400">3 Caixas</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-        <article className="flex w-full gap-4">
-          <img src={done} alt="#" />
-          <div className="flex-1">
-            <p className="line-through text-slate-400">Maçã</p>
-            <p className="text-sm line-through text-slate-400">500g</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-      </section>
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }
 
